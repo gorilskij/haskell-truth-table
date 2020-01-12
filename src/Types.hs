@@ -1,7 +1,5 @@
 module Src.Types(Token(..), Expression(..), toExpr) where
 
-import Data.Map.Ordered
-
 data Token = ParenOpen
            | ParenClose
            | And
@@ -37,5 +35,3 @@ toExpr = toExpr' . simplify where
     toExpr' (Var s:ts) = Variable s : toExpr' ts
     toExpr' (t:ts) = Unparsed t : toExpr' ts
     toExpr' [] = []
-
-type Variables = OMap String Bool

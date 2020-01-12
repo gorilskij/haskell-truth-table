@@ -2,14 +2,18 @@ module Src.ASTBuilder(buildAST) where
 
 import Src.Types
 
+-- assumes that opening paren has been removed
+lowerParens' :: [Expression] -> [Expression] -> [Expression]
+lowerParens' g (Unparsed ParenClose:es) = buildAST g : es
+lowerParens' g (Unparsed ParenOpen:es) = lowerParens' (g ++ [head lp]) (tail lp) where
+    lp = lowerParens' [] es
+lowerParens' g (e:es) = lowerParens' (g ++ [e]) es
+lowerParens' _ [] = error "missing ')'"
+
 lowerParens :: [Expression] -> [Expression]
-lowerParens (Unparsed ParenOpen:es) = lowerParens' [] es where
-    lowerParens' :: [Expression] -> [Expression] -> [Expression]
-    lowerParens' ps (Unparsed ParenOpen:es) = lowerParens' (ps ++ lp) rest where
-        lp = lowerParens' [] es
-        rest = drop (length lp) es
-    lowerParens' p (Unparsed ParenClose:es) = buildAST p : es
-    lowerParens' p (e:es) = lowerParens' (p ++ [e]) es
+lowerParens (Unparsed ParenOpen:es) = head lp : lowerParens (tail lp) where
+    lp = lowerParens' [] es
+lowerParens (Unparsed ParenClose:_) = error "unexpected ')'"
 lowerParens (e:es) = e : lowerParens es
 lowerParens [] = []
 
@@ -35,9 +39,10 @@ lowerIff (e:es) = e : lowerIff es
 lowerIff [] = []
 
 buildAST' = lowerIff . lowerImplies . lowerOr . lowerAnd . lowerNot . lowerParens
+-- buildAST' = lowerImplies . lowerAnd . lowerParens
 
 buildAST :: [Expression] -> Expression
 buildAST ts
     | length astList == 1 = head astList
-    | otherwise           = error ("unexpected astList with length " ++ show (length astList))
+    | otherwise           = error ("unexpected astList with length " ++ show (length astList) ++ "\n" ++ show astList)
     where astList = buildAST' ts
