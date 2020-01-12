@@ -19,7 +19,11 @@ extra-source-files:  CHANGELOG.md
 
 executable truth-table
   main-is:             Main.hs
-  -- other-modules:
+  other-modules:
+      Types,
+      Tokenizer,
+      ASTBuilder,
+      Evaluator
   -- other-extensions:
   build-depends:
       base >=4.13 && <4.14,
