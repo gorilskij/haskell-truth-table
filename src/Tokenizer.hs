@@ -1,8 +1,8 @@
-module Tokenizer(tokenize) where
+module Src.Tokenizer(tokenize) where
 
 import Data.Char
 
-import Types(Token(Var, ParenOpen, ParenClose, And, Or, Not, Implies, Iff))
+import Src.Types
 
 data Expecting = BOPC -- binary operator or paren close
                | Expr -- expression (variable, !, paren open)

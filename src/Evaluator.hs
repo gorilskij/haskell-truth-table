@@ -1,11 +1,11 @@
-module Evaluator(table) where
+module Src.Evaluator(table) where
 
 import Data.Map.Ordered
 import Data.Maybe (fromJust)
 
-import Types(Token(Var), Expression(Variable, Op, BinOp), toExpr)
-import Tokenizer(tokenize)
-import ASTBuilder(buildAST)
+import Src.Types
+import Src.Tokenizer
+import Src.ASTBuilder
 
 type Variables = OMap String Bool
 
@@ -44,10 +44,10 @@ doLine vs e ps = unwords padded ++ " - " ++ b2s (evaluate vs e) where
     b2s False = "F"
 
     vars = map (b2s . snd) (assocs vs)
-    padded = map (uncurry (rPad ' ')) (zip ps vars)
+    padded = zipWith (rPad ' ') ps vars
 
 allTrue :: Variables -> Bool
-allTrue vs = and (map snd (assocs vs))
+allTrue vs = all snd (assocs vs)
 
 doLines :: Variables -> Expression -> [Int] -> String
 doLines vs e ps

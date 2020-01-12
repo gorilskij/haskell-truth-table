@@ -4,8 +4,8 @@ import Data.Char
 import Data.Map.Ordered
 import Data.Maybe (fromJust)
 
-import Tokenizer
-import Evaluator
+import Src.Tokenizer
+import Src.Evaluator
 
 main :: IO ()
 main = do

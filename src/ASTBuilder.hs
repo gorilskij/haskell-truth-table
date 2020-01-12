@@ -1,6 +1,6 @@
-module ASTBuilder(buildAST) where
+module Src.ASTBuilder(buildAST) where
 
-import Types (Expression(Unparsed, Op, BinOp), Token(ParenOpen, ParenClose, And, Or, Not, Implies, Iff))
+import Src.Types
 
 lowerParens :: [Expression] -> [Expression]
 lowerParens (Unparsed ParenOpen:es) = lowerParens' [] es where
@@ -8,7 +8,7 @@ lowerParens (Unparsed ParenOpen:es) = lowerParens' [] es where
     lowerParens' ps (Unparsed ParenOpen:es) = lowerParens' (ps ++ lp) rest where
         lp = lowerParens' [] es
         rest = drop (length lp) es
-    lowerParens' p (Unparsed ParenClose:es) = (buildAST p) : es
+    lowerParens' p (Unparsed ParenClose:es) = buildAST p : es
     lowerParens' p (e:es) = lowerParens' (p ++ [e]) es
 lowerParens (e:es) = e : lowerParens es
 lowerParens [] = []
@@ -34,7 +34,7 @@ lowerIff (e:Unparsed Iff:f:es) = BinOp (==) e f : lowerIff es
 lowerIff (e:es) = e : lowerIff es
 lowerIff [] = []
 
-buildAST' ts = lowerIff . lowerImplies . lowerOr . lowerAnd . lowerNot . lowerParens $ ts where
+buildAST' = lowerIff . lowerImplies . lowerOr . lowerAnd . lowerNot . lowerParens
 
 buildAST :: [Expression] -> Expression
 buildAST ts
