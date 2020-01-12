@@ -31,4 +31,4 @@ tokenize' d Expr s@(c:_)
 tokenize' _ _ (c:_) = error ("unexpected '" ++ c : "'")
 
 tokenize :: String -> [Token]
-tokenize = tokenize' 0 Expr where
+tokenize = tokenize' 0 Expr

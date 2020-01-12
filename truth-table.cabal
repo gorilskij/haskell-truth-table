@@ -18,12 +18,12 @@ build-type:          Simple
 extra-source-files:  CHANGELOG.md
 
 executable truth-table
-  main-is:             Main.hs
+  main-is:             src/Main.hs
   other-modules:
-      Types,
-      Tokenizer,
-      ASTBuilder,
-      Evaluator
+      Src.Types,
+      Src.Tokenizer,
+      Src.ASTBuilder,
+      Src.Evaluator
   -- other-extensions:
   build-depends:
       base >=4.13 && <4.14,

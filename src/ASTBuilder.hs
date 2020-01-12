@@ -18,7 +18,7 @@ lowerNot (Unparsed Not:e:es) = Op not e : lowerNot es
 lowerNot (e:es) = e : lowerNot es
 lowerNot [] = []
 
-lowerAnd (e:Unparsed And:f:es) = BinOp(&&) e f : lowerAnd es
+lowerAnd (e:Unparsed And:f:es) = BinOp (&&) e f : lowerAnd es
 lowerAnd (e:es) = e : lowerAnd es
 lowerAnd [] = []
 
