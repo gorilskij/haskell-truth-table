@@ -4,37 +4,37 @@ import Src.Types
 
 -- assumes that opening paren has been removed
 lowerParens' :: [Expression] -> [Expression] -> [Expression]
-lowerParens' g (Unparsed ParenClose:es) = buildAST g : es
-lowerParens' g (Unparsed ParenOpen:es) = lowerParens' (g ++ [head lp]) (tail lp) where
+lowerParens' g (Unparsed TParenClose:es) = buildAST g : es
+lowerParens' g (Unparsed TParenOpen:es) = lowerParens' (g ++ [head lp]) (tail lp) where
     lp = lowerParens' [] es
 lowerParens' g (e:es) = lowerParens' (g ++ [e]) es
 lowerParens' _ [] = error "missing ')'"
 
 lowerParens :: [Expression] -> [Expression]
-lowerParens (Unparsed ParenOpen:es) = head lp : lowerParens (tail lp) where
+lowerParens (Unparsed TParenOpen:es) = head lp : lowerParens (tail lp) where
     lp = lowerParens' [] es
-lowerParens (Unparsed ParenClose:_) = error "unexpected ')'"
+lowerParens (Unparsed TParenClose:_) = error "unexpected ')'"
 lowerParens (e:es) = e : lowerParens es
 lowerParens [] = []
 
 -- TODO: combine the following functions somehow
-lowerNot (Unparsed Not:e:es) = Op not e : lowerNot es
+lowerNot (Unparsed TNot:e:es) = Op Not e : lowerNot es
 lowerNot (e:es) = e : lowerNot es
 lowerNot [] = []
 
-lowerAnd (e:Unparsed And:f:es) = BinOp (&&) e f : lowerAnd es
+lowerAnd (e:Unparsed TAnd:f:es) = BinOp And e f : lowerAnd es
 lowerAnd (e:es) = e : lowerAnd es
 lowerAnd [] = []
 
-lowerOr (e:Unparsed Or:f:es) = BinOp (||) e f : lowerOr es
+lowerOr (e:Unparsed TOr:f:es) = BinOp Or e f : lowerOr es
 lowerOr (e:es) = e : lowerOr es
 lowerOr [] = []
 
-lowerImplies (e:Unparsed Implies:f:es) = BinOp ((||) . not) e f : lowerImplies es
+lowerImplies (e:Unparsed TImplies:f:es) = BinOp Implies e f : lowerImplies es
 lowerImplies (e:es) = e : lowerImplies es
 lowerImplies [] = []
 
-lowerIff (e:Unparsed Iff:f:es) = BinOp (==) e f : lowerIff es
+lowerIff (e:Unparsed TIff:f:es) = BinOp Iff e f : lowerIff es
 lowerIff (e:es) = e : lowerIff es
 lowerIff [] = []
 

@@ -1,42 +1,72 @@
-module Src.Types(Token(..), Expression(..), toExpr) where
+module Src.Types(
+    Token(..),
+    OpType(..),
+    BinOpType(..),
+    toFunc,
+    toBinFunc,
+    Expression(..),
+    toExpr
+    ) where
 
-data Token = ParenOpen
-           | ParenClose
-           | And
-           | Or
-           | Not
-           | Implies
-           | Iff
-           | Var String
+data Token = TParenOpen
+           | TParenClose
+           | TAnd
+           | TOr
+           | TNot
+           | TImplies
+           | TIff
+           | TVar String
            deriving (Show, Eq)
+
+data OpType = Not
+data BinOpType = And | Or | Implies | Iff deriving Eq
+
+-- TODO figure out how to do this with type classes
+toFunc :: OpType -> (Bool -> Bool)
+toFunc Not = not
+
+toBinFunc :: BinOpType -> (Bool -> Bool -> Bool)
+toBinFunc And = (&&)
+toBinFunc Or = (||)
+toBinFunc Implies = (||) . not
+toBinFunc Iff = (==)
 
 data Expression = Unparsed Token
                 | Variable String
-                | Op (Bool -> Bool) Expression
-                | BinOp (Bool -> Bool -> Bool) Expression Expression
+                | Op {
+                    opType :: OpType,
+                    expr :: Expression
+                }
+                | BinOp {
+                    binOpType :: BinOpType,
+                    left :: Expression,
+                    right :: Expression
+                }
 
 showParenWrapped :: Expression -> String
-showParenWrapped b@(BinOp _ _ _) = "(" ++ show b ++ ")"
+showParenWrapped b@BinOp{} = "(" ++ show b ++ ")"
 showParenWrapped e = show e
 
--- note this is work in progress and may output incorrectly
 instance Show Expression where
     show (Unparsed t) = "Unparsed<" ++ show t ++ ">"
     show (Variable s) = s
-    show (Op f e)
-        | not (f True) = "!" ++ show e
-    show (BinOp f l r)
-        | f True False = showParenWrapped l ++ " | " ++ showParenWrapped r
-        | not (f False False) = showParenWrapped l ++ " & " ++ showParenWrapped r
-        | f False True = showParenWrapped l ++ " => " ++ showParenWrapped r
-        | otherwise = showParenWrapped l ++ " <=> " ++ showParenWrapped r
+    show Op{opType=Not, expr=expr} = "!" ++ show expr
+    show BinOp{binOpType=opType, left=left, right=right}
+        | opType == And
+            = showParenWrapped left ++ " & " ++ showParenWrapped right
+        | opType == Or
+            = showParenWrapped left ++ " | " ++ showParenWrapped right
+        | opType == Implies
+            = showParenWrapped left ++ " => " ++ showParenWrapped right
+        | opType == Iff
+            = showParenWrapped left ++ " <=> " ++ showParenWrapped right
 
 toExpr :: [Token] -> [Expression]
 toExpr = toExpr' . simplify where
-    simplify (Not:Not:ts) = simplify ts
+    simplify (TNot:TNot:ts) = simplify ts
     simplify (t:ts) = t : simplify ts
     simplify [] = []
 
-    toExpr' (Var s:ts) = Variable s : toExpr' ts
+    toExpr' (TVar s:ts) = Variable s : toExpr' ts
     toExpr' (t:ts) = Unparsed t : toExpr' ts
     toExpr' [] = []

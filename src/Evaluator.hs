@@ -12,17 +12,18 @@ type Variables = OMap String Bool
 getVariables :: [Token] -> Variables
 getVariables = getVariables' empty where
     getVariables' :: Variables -> [Token] -> Variables
-    getVariables' ss (Var s:ts) = getVariables' (ss >| (s, False)) ts
+    getVariables' ss (TVar s:ts) = getVariables' (ss >| (s, False)) ts
     getVariables' ss (_:ts) = getVariables' ss ts
     getVariables' ss [] = ss
 
 parseString :: String -> (Variables, Expression)
-parseString s = let t = tokenize s in (getVariables t, buildAST . toExpr $ t)
+parseString s = let t = tokenize s in
+    (getVariables t, buildAST $ toExpr t)
 
 evaluate :: Variables -> Expression -> Bool
 evaluate vs (Variable s) = fromJust $ Data.Map.Ordered.lookup s vs
-evaluate vs (Op o e) = o (evaluate vs e)
-evaluate vs (BinOp o e f) = o (evaluate vs e) (evaluate vs f)
+evaluate vs (Op o e) = toFunc o (evaluate vs e)
+evaluate vs (BinOp o e f) = toBinFunc o (evaluate vs e) (evaluate vs f)
 
 increment :: Variables -> Variables
 increment = fromList . reverse . increment' . reverse . assocs where
@@ -46,6 +47,8 @@ doLine vs e ps = unwords padded ++ " - " ++ b2s (evaluate vs e) where
     vars = map (b2s . snd) (assocs vs)
     padded = zipWith (rPad ' ') ps vars
 
+-- checks if all variables are currently set to True, used to detect when to
+-- stop adding lines to a table (start all false, finish all true)
 allTrue :: Variables -> Bool
 allTrue vs = all snd (assocs vs)
 
