@@ -15,16 +15,21 @@ data Expression = Unparsed Token
                 | Op (Bool -> Bool) Expression
                 | BinOp (Bool -> Bool -> Bool) Expression Expression
 
+showParenWrapped :: Expression -> String
+showParenWrapped b@(BinOp _ _ _) = "(" ++ show b ++ ")"
+showParenWrapped e = show e
+
+-- note this is work in progress and may output incorrectly
 instance Show Expression where
-    show (Unparsed t) = "U" ++ show t
-    show (Variable s) = show s
+    show (Unparsed t) = "Unparsed<" ++ show t ++ ">"
+    show (Variable s) = s
     show (Op f e)
-        | not (f True) = "Not (" ++ show e ++ ")"
-    show (BinOp f e ee)
-        | f True False = "Or (" ++ show e ++ ", " ++ show ee ++ ")"
-        | not (f False False) = "And (" ++ show e ++ ", " ++ show ee ++ ")"
-        | f False True = "Implies (" ++ show e ++ ", " ++ show ee ++ ")"
-        | otherwise = "Iff (" ++ show e ++ ", " ++ show ee ++ ")"
+        | not (f True) = "!" ++ show e
+    show (BinOp f l r)
+        | f True False = showParenWrapped l ++ " | " ++ showParenWrapped r
+        | not (f False False) = showParenWrapped l ++ " & " ++ showParenWrapped r
+        | f False True = showParenWrapped l ++ " => " ++ showParenWrapped r
+        | otherwise = showParenWrapped l ++ " <=> " ++ showParenWrapped r
 
 toExpr :: [Token] -> [Expression]
 toExpr = toExpr' . simplify where
