@@ -22,12 +22,12 @@ T T - T
 Main.hs:
 ```haskell
 main = do
-    let s = "(a & b) | (c & you_can_have_long_names_too) => with-underscores-or-dashes"
+    let s = "a & b | c & you_can_have_long_names_too => with-underscores-or-dashes"
     putStrLn (table s)
     return ()
 ```
 
-output:
+output (note automatic parenthesis wrapping):
 ```
 a b c you_can_have_long_names_too with-underscores-or-dashes - ((a & b) | (c & you_can_have_long_names_too)) => with-underscores-or-dashes
 F F F F  -   -   -   -   -   -    F  -   -   -   -   -   -   - T

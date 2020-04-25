@@ -34,10 +34,11 @@ doTitle :: Variables -> Expression -> (String, [Int])
 doTitle vs e = (unwords keys ++ " - " ++ show e, map length keys) where
     keys = map fst (assocs vs)
 
-rPad :: a -> Int -> [a] -> [a]
-rPad _ 0 _ = []
-rPad p l (x:xs) = x : rPad p (l - 1) xs
-rPad p l [] = p : rPad p (l - 1) []
+-- pads with "  -  -  -..."
+rPad :: Int -> String -> String
+rPad 0 _ = []
+rPad l (x:xs) = x : rPad (l - 1) xs
+rPad l [] = take l (unwords (repeat "  -"))
 
 doLine :: Variables -> Expression -> [Int] -> String
 doLine vs e ps = unwords padded ++ " - " ++ b2s (evaluate vs e) where
@@ -45,7 +46,7 @@ doLine vs e ps = unwords padded ++ " - " ++ b2s (evaluate vs e) where
     b2s False = "F"
 
     vars = map (b2s . snd) (assocs vs)
-    padded = zipWith (rPad ' ') ps vars
+    padded = zipWith rPad ps vars
 
 -- checks if all variables are currently set to True, used to detect when to
 -- stop adding lines to a table (start all false, finish all true)
