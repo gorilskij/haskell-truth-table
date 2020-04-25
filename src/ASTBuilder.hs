@@ -39,7 +39,6 @@ lowerIff (e:es) = e : lowerIff es
 lowerIff [] = []
 
 buildAST' = lowerIff . lowerImplies . lowerOr . lowerAnd . lowerNot . lowerParens
--- buildAST' = lowerImplies . lowerAnd . lowerParens
 
 buildAST :: [Expression] -> Expression
 buildAST ts
