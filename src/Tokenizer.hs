@@ -1,8 +1,8 @@
-module Src.Tokenizer(tokenize) where
+module Tokenizer(tokenize) where
 
 import Data.Char
 
-import Src.Types
+import Types
 
 data Expecting = BOPC -- binary operator or paren close
                | Expr -- expression (variable, !, paren open)

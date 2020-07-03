@@ -1,4 +1,4 @@
-module Src.Types(
+module Types(
     Token(..),
     OpType(..),
     BinOpType(..),

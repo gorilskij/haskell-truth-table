@@ -1,6 +1,6 @@
-module Src.ASTBuilder(buildAST) where
+module ASTBuilder(buildAST) where
 
-import Src.Types
+import Types
 
 -- assumes that opening paren has been removed
 lowerParens' :: [Expression] -> [Expression] -> [Expression]
@@ -18,6 +18,7 @@ lowerParens (e:es) = e : lowerParens es
 lowerParens [] = []
 
 -- TODO: combine the following functions somehow
+lowerNot :: [Expression] -> [Expression]
 lowerNot (Unparsed TNot:e:es) = Op Not e : lowerNot es
 lowerNot (e:es) = e : lowerNot es
 lowerNot [] = []

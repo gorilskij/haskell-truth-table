@@ -1,11 +1,11 @@
-module Src.Evaluator(table) where
+module Evaluator(table) where
 
 import Data.Map.Ordered
 import Data.Maybe (fromJust)
 
-import Src.Types
-import Src.Tokenizer
-import Src.ASTBuilder
+import Types
+import Tokenizer
+import ASTBuilder
 
 type Variables = OMap String Bool
 
